@@ -1,2 +1,7 @@
 compiler/
 site/.idea/
+plugin/.vscode/settings.json
+plugin/include/
+plugin/spcomp.exe
+plugin/compile.exe
+plugin/compile!.bat
