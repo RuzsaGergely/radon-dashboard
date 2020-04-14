@@ -5,3 +5,4 @@ plugin/include/
 plugin/spcomp.exe
 plugin/compile.exe
 plugin/compile!.bat
+plugin/settings.txt
