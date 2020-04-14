@@ -61,7 +61,7 @@ public Action Check_server(Handle timer)
 {
 
     char url_sufix[512];
-    Format(url_sufix, sizeof(url_sufix), "/getTasks/%s", servernum);
+    Format(url_sufix, sizeof(url_sufix), "/getTasks/%d", StringToInt(servernum));
     //PrintToChatAll(site);
     //PrintToChatAll(urlextend);
     
