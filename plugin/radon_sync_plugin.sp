@@ -52,7 +52,12 @@ public void OnPluginStart()
 
 public OnRoundStart(Handle:event, const String:name[], bool:dontBroadcast) 
 { 
-
+    char url_sufix[512];
+    Format(url_sufix, sizeof(url_sufix), "/setPoints/%d", StringToInt(servernum));
+    JSONObject postObject = new JSONObject();
+    postObject.SetInt("ctpoint", CS_GetTeamScore(3));
+    postObject.SetInt("tpoint", CS_GetTeamScore(2));
+    httpClient.Post(url_sufix, postObject, OnPointUpdate);
 }  
 
 
@@ -128,3 +133,15 @@ public void OnTaskDone(HTTPResponse response, any value)
 
     PrintToServer("Created todo with ID %d", todoId);
 } 
+
+public void OnPointUpdate(HTTPResponse response, any value)
+{
+    if (response.Status != HTTPStatus_Created) {
+        // Failed to create todo
+        return;
+    }
+    if (response.Data == null) {
+        // Invalid JSON response
+        return;
+    }
+}
