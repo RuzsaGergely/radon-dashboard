@@ -14,7 +14,7 @@ public Plugin myinfo =
 /*
 
 TO-DO:
-- Get on the job handling requests with RIP
+- Moving to the point system
 
  */
 
@@ -97,9 +97,34 @@ public void OnJobReceived(HTTPResponse response, any value)
 
         PrintToServer("Retrieved job with task of '%s'", jobTask);
         PrintToChatAll(jobTask);
-        //ServerCommand(jobTask);
+        ServerCommand(jobTask);
 
-        // Get() creates a new handle, so delete it when we are done with it
+        char url_sufix[512];
+        Format(url_sufix, sizeof(url_sufix), "/doneTask/%d", StringToInt(servernum));
+        JSONObject postObject = new JSONObject();
+        postObject.SetInt("tasknum", StringToInt(jobNum));
+        httpClient.Post(url_sufix, postObject, OnTaskDone);
+
+        delete postObject;
         delete job;
     }
+
+    delete jobs;
+} 
+
+public void OnTaskDone(HTTPResponse response, any value)
+{
+    if (response.Status != HTTPStatus_Created) {
+        // Failed to create todo
+        return;
+    }
+    if (response.Data == null) {
+        // Invalid JSON response
+        return;
+    }
+
+    JSONObject todo = view_as<JSONObject>(response.Data);
+    int todoId = todo.GetInt("id");
+
+    PrintToServer("Created todo with ID %d", todoId);
 } 
