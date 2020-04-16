@@ -19,7 +19,6 @@ TO-DO:
  */
 
 char servernum[10];
-char gettask[512];
 
 HTTPClient httpClient;
 
@@ -39,8 +38,6 @@ public void OnPluginStart()
     }*/
 
     ReadFileLine(fileHandle,servernum,sizeof(servernum));
-
-    ReadFileLine(fileHandle,gettask,sizeof(gettask));
 
     char site[1024];
     ReadFileLine(fileHandle,site,sizeof(site));
