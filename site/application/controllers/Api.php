@@ -17,7 +17,7 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["name"], $decoded["team"]) && !empty($decoded["team"] . $decoded["name"])){
+                if (isset($decoded["name"], $decoded["team"], $decoded["apikey"]) && !empty($decoded["team"] . $decoded["name"] . $decoded["apikey"]) && $decoded["apikey"] == API_KEY){
                     if($decoded["team"] == 1){
                         $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
                         $this->db->query($sql, array($server, "mp_teamname_1 " . $decoded["name"]));
@@ -59,7 +59,7 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["country"], $decoded["team"]) && strlen($decoded["country"]) == 2 && !empty($decoded["team"]) && !is_numeric($decoded["country"])){
+                if (isset($decoded["country"], $decoded["team"], $decoded["apikey"]) && strlen($decoded["country"]) == 2 && !empty($decoded["team"] . $decoded["apikey"]) && !is_numeric($decoded["country"]) && $decoded["apikey"] == API_KEY){
 
                     if($decoded["team"] == 1){
                         $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
@@ -114,7 +114,7 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["map"]) && in_array($decoded["map"], $maps)){
+                if (isset($decoded["map"], $decoded["apikey"]) && $decoded["apikey"] == API_KEY && in_array($decoded["map"], $maps)){
 
                     $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
                     $this->db->query($sql, array($server, "changelevel " . $decoded["map"]));
@@ -144,7 +144,7 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if(isset($decoded["tasknum"]) && !empty($decoded["tasknum"]) && is_numeric($decoded["tasknum"])){
+                if(isset($decoded["tasknum"], $decoded["apikey"]) && !empty($decoded["tasknum"] . $decoded["apikey"]) && is_numeric($decoded["tasknum"]) && $decoded["apikey"] == API_KEY){
                     $sql = "INSERT INTO `old_jobs` SELECT * FROM `jobs` WHERE `tasknum` = ?";
                     $this->db->query($sql, array($decoded["tasknum"]));
                     $sql = "DELETE FROM `jobs` WHERE `tasknum` = ?";
@@ -197,7 +197,7 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if(isset($decoded["ctpoint"], $decoded["tpoint"]) && !empty($decoded["ctpoint"] . $decoded["tpoint"]) && is_numeric($decoded["ctpoint"]) && is_numeric($decoded["tpoint"])){
+                if(isset($decoded["ctpoint"], $decoded["tpoint"], $decoded["apikey"]) && $decoded["apikey"] == API_KEY && !empty($decoded["ctpoint"] . $decoded["tpoint"]) && is_numeric($decoded["ctpoint"]) && is_numeric($decoded["tpoint"])){
                     $sql = "SELECT * FROM `server_points` WHERE `servernum`= ?";
                     $this->db->query($sql, array($server));
 
@@ -261,7 +261,7 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"]) && !empty($decoded["txt"] . $decoded["team1"] . $decoded["team2"])){
+                if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["apikey"]) && $decoded["apikey"] == API_KEY && !empty($decoded["txt"] . $decoded["team1"] . $decoded["team2"])){
                     $count = 0;
                     $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
                     $this->db->query($sql, array($server, "mp_teammatchstat_txt " . $decoded["txt"]));
@@ -291,6 +291,37 @@ class Api extends CI_Controller
             }
         } else {
             $this->respError(400, "Bad request", "Invalid or no argument");
+        }
+    }
+
+    public function getToken(){
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+            $rawdata = file_get_contents("php://input");
+            $decoded = json_decode($rawdata, true);
+
+            if(isset($decoded["username"], $decoded["password"]) && !empty($decoded["username"] . $decoded["password"])){
+                $sql = "SELECT * FROM `users` WHERE `username`=?";
+                $query = $this->db->query($sql, array($decoded["username"]));
+
+                foreach ($query->result() as $row)
+                {
+                    if(password_verify($decoded["password"], $row->password)) {
+                        header('Content-Type: application/json');
+                        $response = array(
+                            "token" => base64_encode($decoded["username"] . ":". $decoded["password"])
+                        );
+                        $json_response = json_encode($response);
+                        echo $json_response;
+                    } else {
+                        $this->respError(400, "Bad request", "Wrong username or password");
+                    }
+                }
+
+            } else {
+                $this->respError(400, "Bad request", "Invalid or no argument");
+            }
+        } else {
+            $this->respError(400, "Bad request", "Invalid request type");
         }
     }
 
