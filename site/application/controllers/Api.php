@@ -17,30 +17,22 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["name"], $decoded["team"], $decoded["apikey"]) && !empty($decoded["team"] . $decoded["name"] . $decoded["apikey"]) && $decoded["apikey"] == API_KEY){
-                    if($decoded["team"] == 1){
-                        $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                        $this->db->query($sql, array($server, "mp_teamname_1 " . $decoded["name"]));
-
-                        if($this->db->affected_rows() > 0){
-                            $this->respError(200, "OK", "Task sent");
+                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                    $this->changeTeamnameHandler($server, $decoded);
+                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                    $token = explode(":",base64_decode($decoded["key"], true));
+                    $sql = "SELECT * FROM `users` WHERE `username`=?";
+                    $query = $this->db->query($sql, array($token[0]));
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($token[1], $row->password)) {
+                            $this->changeTeamnameHandler($server, $decoded);
                         } else {
-                            $this->respError(500, "Internal error", "Task not sent");
+                            $this->respError(400, "Bad request", "Wrong username or password");
                         }
-                    } else if($decoded["team"] == 2){
-                        $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                        $this->db->query($sql, array($server, "mp_teamname_2 " . $decoded["name"]));
-
-                        if($this->db->affected_rows() > 0){
-                            $this->respError(200, "OK", "Task sent");
-                        } else {
-                            $this->respError(500, "Internal error", "Task not sent");
-                        }
-                    } else{
-                        $this->respError(400, "Bad request", "No or invalid team");
                     }
                 } else {
-                    $this->respError(400, "Bad request", "No or invalid name or team");
+                    $this->respError(400, "Bad request", "Invalid auth");
                 }
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
@@ -59,32 +51,22 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["country"], $decoded["team"], $decoded["apikey"]) && strlen($decoded["country"]) == 2 && !empty($decoded["team"] . $decoded["apikey"]) && !is_numeric($decoded["country"]) && $decoded["apikey"] == API_KEY){
-
-                    if($decoded["team"] == 1){
-                        $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                        $this->db->query($sql, array($server, "mp_teamflag_1 " . $decoded["country"]));
-
-                        if($this->db->affected_rows() > 0){
-                            $this->respError(200, "OK", "Task sent");
+                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                    $this->changeFlagHandler($server, $decoded);
+                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                    $token = explode(":",base64_decode($decoded["key"], true));
+                    $sql = "SELECT * FROM `users` WHERE `username`=?";
+                    $query = $this->db->query($sql, array($token[0]));
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($token[1], $row->password)) {
+                            $this->changeFlagHandler($server, $decoded);
                         } else {
-                            $this->respError(500, "Internal error", "Task not sent");
+                            $this->respError(400, "Bad request", "Wrong username or password");
                         }
-                    } else if($decoded["team"] == 2){
-                        $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                        $this->db->query($sql, array($server, "mp_teamflag_2 " . $decoded["country"]));
-
-                        if($this->db->affected_rows() > 0){
-                            $this->respError(200, "OK", "Task sent");
-                        } else {
-                            $this->respError(500, "Internal error", "Task not sent");
-                        }
-                    } else{
-                        $this->respError(400, "Bad request", "No or invalid team");
                     }
-
                 } else {
-                    $this->respError(400, "Bad request", "No or invalid country");
+                    $this->respError(400, "Bad request", "Invalid auth");
                 }
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
@@ -97,15 +79,6 @@ class Api extends CI_Controller
 
     public function changeMap($server=null){
 
-	    $maps = array(
-	        "de_dust2",
-            "de_inferno",
-            "de_train",
-            "de_mirage",
-            "de_nuke",
-            "de_overpass",
-            "de_vertigo"
-        );
 
         if($server!=null && is_numeric($server)){
 
@@ -114,19 +87,22 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["map"], $decoded["apikey"]) && $decoded["apikey"] == API_KEY && in_array($decoded["map"], $maps)){
-
-                    $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                    $this->db->query($sql, array($server, "changelevel " . $decoded["map"]));
-
-                    if($this->db->affected_rows() > 0){
-                        $this->respError(200, "OK", "Task sent");
-                    } else {
-                        $this->respError(500, "Internal error", "Task not sent");
+                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                    $this->changeMapHandler($server, $decoded);
+                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                    $token = explode(":",base64_decode($decoded["key"], true));
+                    $sql = "SELECT * FROM `users` WHERE `username`=?";
+                    $query = $this->db->query($sql, array($token[0]));
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($token[1], $row->password)) {
+                            $this->changeMapHandler($server, $decoded);
+                        } else {
+                            $this->respError(400, "Bad request", "Wrong username or password");
+                        }
                     }
-
                 } else {
-                    $this->respError(400, "Bad request", "No or invalid map");
+                    $this->respError(400, "Bad request", "Invalid auth");
                 }
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
@@ -144,14 +120,22 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if(isset($decoded["tasknum"], $decoded["apikey"]) && !empty($decoded["tasknum"] . $decoded["apikey"]) && is_numeric($decoded["tasknum"]) && $decoded["apikey"] == API_KEY){
-                    $sql = "INSERT INTO `old_jobs` SELECT * FROM `jobs` WHERE `tasknum` = ?";
-                    $this->db->query($sql, array($decoded["tasknum"]));
-                    $sql = "DELETE FROM `jobs` WHERE `tasknum` = ?";
-                    $this->db->query($sql, array($decoded["tasknum"]));
-                    $this->respError(200, "OK", "Task marked as done");
+                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                    $this->doneTaskHandler($server, $decoded);
+                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                    $token = explode(":",base64_decode($decoded["key"], true));
+                    $sql = "SELECT * FROM `users` WHERE `username`=?";
+                    $query = $this->db->query($sql, array($token[0]));
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($token[1], $row->password)) {
+                            $this->doneTaskHandler($server, $decoded);
+                        } else {
+                            $this->respError(400, "Bad request", "Wrong username or password");
+                        }
+                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid or no tasknum");
+                    $this->respError(400, "Bad request", "Invalid auth");
                 }
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
@@ -197,30 +181,22 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if(isset($decoded["ctpoint"], $decoded["tpoint"], $decoded["apikey"]) && $decoded["apikey"] == API_KEY && !empty($decoded["ctpoint"] . $decoded["tpoint"]) && is_numeric($decoded["ctpoint"]) && is_numeric($decoded["tpoint"])){
-                    $sql = "SELECT * FROM `server_points` WHERE `servernum`= ?";
-                    $this->db->query($sql, array($server));
-
-                    if ($this->db->affected_rows() > 0){
-                        $sql = "UPDATE `server_points` SET `t_point`=?,`ct_point`=? WHERE `servernum`=?";
-                        $this->db->query($sql, array($decoded["tpoint"], $decoded["ctpoint"], $server));
-                        if ($this->db->affected_rows() > 0){
-                            $this->respError(200, "OK", "Points updated");
+                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                    $this->setPointsHandler($server, $decoded);
+                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                    $token = explode(":",base64_decode($decoded["key"], true));
+                    $sql = "SELECT * FROM `users` WHERE `username`=?";
+                    $query = $this->db->query($sql, array($token[0]));
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($token[1], $row->password)) {
+                            $this->setPointsHandler($server, $decoded);
                         } else {
-                            $this->respError(500, "Internal error", "Points not updated");
-                        }
-                    } else {
-                        $sql = "INSERT INTO `server_points`(`servernum`, `t_point`, `ct_point`) VALUES (?,?,?)";
-                        $this->db->query($sql, array($server, $decoded["tpoint"], $decoded["ctpoint"]));
-                        if ($this->db->affected_rows() > 0){
-                            $this->respError(200, "OK", "Points updated and server registered");
-                        } else {
-                            $this->respError(500, "Internal error", "Points not updated and/or not registered");
+                            $this->respError(400, "Bad request", "Wrong username or password");
                         }
                     }
-
                 } else {
-                    $this->respError(400, "Bad request", "Missing or invalid point");
+                    $this->respError(400, "Bad request", "Invalid auth");
                 }
 
 
@@ -261,30 +237,22 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["apikey"]) && $decoded["apikey"] == API_KEY && !empty($decoded["txt"] . $decoded["team1"] . $decoded["team2"])){
-                    $count = 0;
-                    $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                    $this->db->query($sql, array($server, "mp_teammatchstat_txt " . $decoded["txt"]));
-                    if($this->db->affected_rows() > 0){
-                        $count+=1;
-                    }
-                    $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                    $this->db->query($sql, array($server, "mp_teammatchstat_1 " . $decoded["team1"]));
-                    if($this->db->affected_rows() > 0){
-                        $count+=1;
-                    }
-                    $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-                    $this->db->query($sql, array($server, "mp_teammatchstat_2 " . $decoded["team2"]));
-                    if($this->db->affected_rows() > 0){
-                        $count+=1;
-                    }
-                    if($count == 3){
-                        $this->respError(200, "OK", "3/3 task sent");
-                    } else {
-                        $this->respError(500, "Internal error", $count . "/3 task sent");
+                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                    $this->changeStatsHandler($server, $decoded);
+                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                    $token = explode(":",base64_decode($decoded["key"], true));
+                    $sql = "SELECT * FROM `users` WHERE `username`=?";
+                    $query = $this->db->query($sql, array($token[0]));
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($token[1], $row->password)) {
+                            $this->changeStatsHandler($server, $decoded);
+                        } else {
+                            $this->respError(400, "Bad request", "Wrong username or password");
+                        }
                     }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid or empty input");
+                    $this->respError(400, "Bad request", "Invalid auth");
                 }
             }else {
                 $this->respError(400, "Bad request", "Invalid request type");
@@ -335,4 +303,169 @@ class Api extends CI_Controller
 		$json_response = json_encode($response);
 		echo $json_response;
 	}
+
+	// Checker function for token
+    private function is_token($str){
+        if ( base64_encode(base64_decode($str, true)) === $str){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Handlers for the controller functions
+    private function changeTeamnameHandler($server, $decoded){
+        if (isset($decoded["name"], $decoded["team"]) && !empty($decoded["team"] . $decoded["name"])){
+            if($decoded["team"] == 1){
+                $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+                $this->db->query($sql, array($server, "mp_teamname_1 " . $decoded["name"]));
+
+                if($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Task sent");
+                } else {
+                    $this->respError(500, "Internal error", "Task not sent");
+                }
+            } else if($decoded["team"] == 2){
+                $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+                $this->db->query($sql, array($server, "mp_teamname_2 " . $decoded["name"]));
+
+                if($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Task sent");
+                } else {
+                    $this->respError(500, "Internal error", "Task not sent");
+                }
+            } else{
+                $this->respError(400, "Bad request", "No or invalid team");
+            }
+        } else {
+            $this->respError(400, "Bad request", "No or invalid name or team");
+        }
+    }
+
+    private function changeFlagHandler($server, $decoded){
+        if (isset($decoded["country"], $decoded["team"]) && strlen($decoded["country"]) == 2 && !empty($decoded["team"] ) && !is_numeric($decoded["country"])){
+
+            if($decoded["team"] == 1){
+                $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+                $this->db->query($sql, array($server, "mp_teamflag_1 " . $decoded["country"]));
+
+                if($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Task sent");
+                } else {
+                    $this->respError(500, "Internal error", "Task not sent");
+                }
+            } else if($decoded["team"] == 2){
+                $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+                $this->db->query($sql, array($server, "mp_teamflag_2 " . $decoded["country"]));
+
+                if($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Task sent");
+                } else {
+                    $this->respError(500, "Internal error", "Task not sent");
+                }
+            } else{
+                $this->respError(400, "Bad request", "No or invalid team");
+            }
+
+        } else {
+            $this->respError(400, "Bad request", "No or invalid country");
+        }
+    }
+
+    private function changeMapHandler($server, $decoded){
+        $maps = array(
+            "de_dust2",
+            "de_inferno",
+            "de_train",
+            "de_mirage",
+            "de_nuke",
+            "de_overpass",
+            "de_vertigo"
+        );
+
+        if (isset($decoded["map"]) && in_array($decoded["map"], $maps)){
+
+            $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+            $this->db->query($sql, array($server, "changelevel " . $decoded["map"]));
+
+            if($this->db->affected_rows() > 0){
+                $this->respError(200, "OK", "Task sent");
+            } else {
+                $this->respError(500, "Internal error", "Task not sent");
+            }
+
+        } else {
+            $this->respError(400, "Bad request", "No or invalid map");
+        }
+
+    }
+
+    private function doneTaskHandler($server, $decoded){
+        if(isset($decoded["tasknum"]) && !empty($decoded["tasknum"]) && is_numeric($decoded["tasknum"])){
+            $sql = "INSERT INTO `old_jobs` SELECT * FROM `jobs` WHERE `tasknum` = ?";
+            $this->db->query($sql, array($decoded["tasknum"]));
+            $sql = "DELETE FROM `jobs` WHERE `tasknum` = ?";
+            $this->db->query($sql, array($decoded["tasknum"]));
+            $this->respError(200, "OK", "Task marked as done");
+        } else {
+            $this->respError(400, "Bad request", "Invalid or no tasknum");
+        }
+    }
+
+    private function setPointsHandler($server, $decoded){
+        if(isset($decoded["ctpoint"], $decoded["tpoint"]) && !empty($decoded["ctpoint"] . $decoded["tpoint"]) && is_numeric($decoded["ctpoint"]) && is_numeric($decoded["tpoint"])){
+            $sql = "SELECT * FROM `server_points` WHERE `servernum`= ?";
+            $this->db->query($sql, array($server));
+
+            if ($this->db->affected_rows() > 0){
+                $sql = "UPDATE `server_points` SET `t_point`=?,`ct_point`=? WHERE `servernum`=?";
+                $this->db->query($sql, array($decoded["tpoint"], $decoded["ctpoint"], $server));
+                if ($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Points updated");
+                } else {
+                    $this->respError(500, "Internal error", "Points not updated");
+                }
+            } else {
+                $sql = "INSERT INTO `server_points`(`servernum`, `t_point`, `ct_point`) VALUES (?,?,?)";
+                $this->db->query($sql, array($server, $decoded["tpoint"], $decoded["ctpoint"]));
+                if ($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Points updated and server registered");
+                } else {
+                    $this->respError(500, "Internal error", "Points not updated and/or not registered");
+                }
+            }
+
+        } else {
+            $this->respError(400, "Bad request", "Missing or invalid point");
+        }
+    }
+
+    private function changeStatsHandler($server, $decoded){
+        if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["apikey"]) && !empty($decoded["txt"] . $decoded["team1"] . $decoded["team2"])){
+            $count = 0;
+            $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+            $this->db->query($sql, array($server, "mp_teammatchstat_txt " . $decoded["txt"]));
+            if($this->db->affected_rows() > 0){
+                $count+=1;
+            }
+            $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+            $this->db->query($sql, array($server, "mp_teammatchstat_1 " . $decoded["team1"]));
+            if($this->db->affected_rows() > 0){
+                $count+=1;
+            }
+            $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+            $this->db->query($sql, array($server, "mp_teammatchstat_2 " . $decoded["team2"]));
+            if($this->db->affected_rows() > 0){
+                $count+=1;
+            }
+            if($count == 3){
+                $this->respError(200, "OK", "3/3 task sent");
+            } else {
+                $this->respError(500, "Internal error", $count . "/3 task sent");
+            }
+        } else {
+            $this->respError(400, "Bad request", "Invalid or empty input");
+        }
+    }
+
 }

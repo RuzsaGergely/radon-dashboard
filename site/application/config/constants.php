@@ -85,4 +85,4 @@ defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automat
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
 // Custom constants
-defined('API_KEY')      OR define('API_KEY', "0000-0000-0000-0000"); // API key
+defined('API_KEY')      OR define('API_KEY', "1f8e-2b67-5803-351c7"); // API key
