@@ -271,25 +271,50 @@ class Api extends CI_Controller
                 $sql = "SELECT * FROM `users` WHERE `username`=?";
                 $query = $this->db->query($sql, array($decoded["username"]));
 
-                foreach ($query->result() as $row)
-                {
-                    if(password_verify($decoded["password"], $row->password)) {
-                        header('Content-Type: application/json');
-                        $response = array(
-                            "token" => base64_encode($decoded["username"] . ":". $decoded["password"])
-                        );
-                        $json_response = json_encode($response);
-                        echo $json_response;
-                    } else {
-                        $this->respError(400, "Bad request", "Wrong username or password");
+                if($this->db->affected_rows() > 0){
+                    foreach ($query->result() as $row)
+                    {
+                        if(password_verify($decoded["password"], $row->password)) {
+                            header('Content-Type: application/json');
+                            $response = array(
+                                "token" => base64_encode($decoded["username"] . ":". $decoded["password"])
+                            );
+                            $json_response = json_encode($response);
+                            echo $json_response;
+                        } else {
+                            $this->respError(400, "Bad request", "Wrong username or password");
+                        }
                     }
+                } else {
+                    $this->respError(400, "Bad request", "Wrong username or password");
                 }
-
             } else {
                 $this->respError(400, "Bad request", "Invalid or no argument");
             }
+
         } else {
             $this->respError(400, "Bad request", "Invalid request type");
+        }
+    }
+
+    public function getServers(){
+        if($_SERVER['REQUEST_METHOD'] == "GET"){
+
+            $query = $this->db->query("SELECT * FROM `servers`");
+
+            $response = array();
+
+            foreach ($query->result() as $row)
+            {
+                array_push($response, array(
+                    "server_number" => $row->id,
+                    "server_name" =>$row->servername
+                ));
+            }
+
+            header('Content-Type: application/json');
+            $json_response = json_encode($response);
+            echo $json_response;
         }
     }
 
@@ -441,12 +466,14 @@ class Api extends CI_Controller
     }
 
     private function changeStatsHandler($server, $decoded){
-        if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["apikey"]) && !empty($decoded["txt"] . $decoded["team1"] . $decoded["team2"])){
+        if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["apikey"]) && !empty($decoded["team1"] . $decoded["team2"])){
             $count = 0;
-            $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
-            $this->db->query($sql, array($server, "mp_teammatchstat_txt " . $decoded["txt"]));
-            if($this->db->affected_rows() > 0){
-                $count+=1;
+            if(empty($decoded["txt"])){
+                $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
+                $this->db->query($sql, array($server, "mp_teammatchstat_txt " . $decoded["txt"]));
+                if($this->db->affected_rows() > 0){
+                    $count+=1;
+                }
             }
             $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
             $this->db->query($sql, array($server, "mp_teammatchstat_1 " . $decoded["team1"]));
@@ -458,8 +485,8 @@ class Api extends CI_Controller
             if($this->db->affected_rows() > 0){
                 $count+=1;
             }
-            if($count == 3){
-                $this->respError(200, "OK", "3/3 task sent");
+            if($count >= 2){
+                $this->respError(200, "OK", "Task sent");
             } else {
                 $this->respError(500, "Internal error", $count . "/3 task sent");
             }
