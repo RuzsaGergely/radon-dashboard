@@ -466,7 +466,7 @@ class Api extends CI_Controller
     }
 
     private function changeStatsHandler($server, $decoded){
-        if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["apikey"]) && !empty($decoded["team1"] . $decoded["team2"])){
+        if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["key"]) && !empty($decoded["team1"] . $decoded["team2"])){
             $count = 0;
             if(empty($decoded["txt"])){
                 $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";

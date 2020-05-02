@@ -18,7 +18,7 @@ const login = () => {
     }
 
     const instance = axios.create({
-        baseURL: 'http://beast.spinehouse.hu:8080/radon/api/',
+        baseURL: settings.url,
         timeout: 1000
     });
 
