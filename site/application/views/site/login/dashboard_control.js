@@ -9,7 +9,6 @@ const checkLoginStatus = () => {
     } else {
         //<a class="dropdown-item" href="#">Action</a>
         let dropdownmenu = document.getElementById("serverList");
-
         instance.get('getServers')
             .then(response => {
                 const respmesssage = response.data;
@@ -25,6 +24,7 @@ const checkLoginStatus = () => {
                 console.error(error);
                 toastr["error"]("Something went wrong... sorry :(");
             });
+            displayOverview();
     }
 }
 
@@ -183,4 +183,25 @@ const changeStatus = (serverid) => {
 const logout = () => {
     localStorage.clear();
     location.reload();
+}
+
+const displayOverview = () => {
+    instance.get('getPoints')
+    .then(response => {
+        const respmesssage = response.data;
+        console.log(respmesssage);
+        var obja = JSON.parse(JSON.stringify(respmesssage));
+        //dropdownmenu.innerHTML += "<a class=\"dropdown-item\" href=\"#\" onclick=\"displayServer(" + obj.server_number + ")\">"+obj.server_name+"</a>"
+        let container = document.getElementById("display-container");
+        container.innerHTML = "<h1>Overview</h1><table class=\"table\"> <thead> <tr> <th scope=\"col\">Server #</th> <th scope=\"col\">CT points</th> <th scope=\"col\">T points</th> </tr> </thead> <tbody id=\"scorekeeper\"></tbody> </table>";
+        let table = document.getElementById("scorekeeper");
+        obja.forEach(function (item) {
+            table.innerHTML += "<tr><th scope=\"row\">" + item.server + "</th><td>" + item.ctpoint + "</td><td>" + item.tpoint + "</td></tr>"
+        });
+
+    })
+    .catch(error => {
+        console.error(error);
+        toastr["error"]("Something went wrong... sorry :(");
+    });
 }

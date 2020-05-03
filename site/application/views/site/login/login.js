@@ -1,3 +1,9 @@
+const checkLoginStatus = () => {
+    if (localStorage.getItem("user_token") !== null) {
+        window.location.replace("dashboard.html");
+    }
+}
+
 const login = () => {
     toastr.options = {
         "closeButton": false,
@@ -46,3 +52,29 @@ const login = () => {
             toastr["error"]("Something went wrong... sorry :(");
         });
 };
+
+var input = document.getElementById("input_password");
+
+// Execute a function when the user releases a key on the keyboard
+input.addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("loginbtn").click();
+  }
+});
+
+var input2 = document.getElementById("input_username");
+
+// Execute a function when the user releases a key on the keyboard
+input2.addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("loginbtn").click();
+  }
+});

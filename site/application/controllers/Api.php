@@ -318,7 +318,38 @@ class Api extends CI_Controller
         }
     }
 
-	// Not reachable from browser or through API request
+    public function createUser(){
+
+        if($_SERVER['REQUEST_METHOD'] == "POST") {
+
+            $rawdata = file_get_contents("php://input");
+            $decoded = json_decode($rawdata, true);
+
+            if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                $this->createUserHandler($decoded);
+            } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                $token = explode(":",base64_decode($decoded["key"], true));
+                $sql = "SELECT * FROM `users` WHERE `username`=?";
+                $query = $this->db->query($sql, array($token[0]));
+                foreach ($query->result() as $row)
+                {
+                    if(password_verify($token[1], $row->password)) {
+                        $this->createUserHandler($decoded);
+                    } else {
+                        $this->respError(400, "Bad request", "Wrong username or password");
+                    }
+                }
+            } else {
+                $this->respError(400, "Bad request", "Invalid auth");
+            }
+
+
+        } else {
+            $this->respError(400, "Bad request", "Invalid request type");
+        }
+    }
+
+    // Not reachable from browser or through API request
 	private function respError($httpcode, $httpstatus, $errormessage)
 	{
 		$response['http_code'] = $httpcode;
@@ -489,6 +520,30 @@ class Api extends CI_Controller
                 $this->respError(200, "OK", "Task sent");
             } else {
                 $this->respError(500, "Internal error", $count . "/3 task sent");
+            }
+        } else {
+            $this->respError(400, "Bad request", "Invalid or empty input");
+        }
+    }
+
+    private function createUserHandler($decoded){
+        if(isset($decoded["username"], $decoded["password"]) && !empty($decoded["username"] . $decoded["password"])){
+            $sql = "SELECT * FROM `users` WHERE `username`=?";
+            $this->db->query($sql, $decoded["username"]);
+            if($this->db->affected_rows() > 0){
+                $this->respError(400, "Bad request", "User already exists!");
+            } else {
+                if(preg_match("#[a-zA-Z][0-9]+#", $decoded["password"]) && strlen($decoded["password"]) >= 8){
+                    $sql = "INSERT INTO `users`(`username`, `password`) VALUES (?,?)";
+                    $this->db->query($sql, array($decoded["username"], password_hash($decoded["password"])));
+                    if($this->db->affected_rows() > 0){
+                        $this->respError(200, "OK", "User created!");
+                    } else {
+                        $this->respError(500, "Server Error", "Something went wrong");
+                    }
+                } else {
+                    $this->respError(400, "Bad request", "Password not fulfills the requirements");
+                }
             }
         } else {
             $this->respError(400, "Bad request", "Invalid or empty input");
