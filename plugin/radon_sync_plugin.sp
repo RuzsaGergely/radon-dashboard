@@ -19,6 +19,7 @@ TO-DO:
  */
 
 char servernum[10];
+char apikey[64];
 
 HTTPClient httpClient;
 
@@ -38,9 +39,11 @@ public void OnPluginStart()
     }*/
 
     ReadFileLine(fileHandle,servernum,sizeof(servernum));
-
+    
     char site[1024];
     ReadFileLine(fileHandle,site,sizeof(site));
+
+    ReadFileLine(fileHandle,apikey,sizeof(apikey));
 
     CloseHandle(fileHandle);
 
@@ -54,6 +57,9 @@ public OnRoundStart(Handle:event, const String:name[], bool:dontBroadcast)
     JSONObject postObject = new JSONObject();
     postObject.SetInt("ctpoint", CS_GetTeamScore(3));
     postObject.SetInt("tpoint", CS_GetTeamScore(2));
+    char key2[512];
+    Format(key2, sizeof(key2), "%s", apikey);
+    postObject.SetString("key", key2);
     httpClient.Post(url_sufix, postObject, OnPointUpdate);
 }  
 
@@ -65,6 +71,7 @@ public Action Check_server(Handle timer)
     char url_sufix[512];
     Format(url_sufix, sizeof(url_sufix), "/getTasks/%d", StringToInt(servernum));
     //PrintToChatAll(site);
+    //PrintToChatAll(apikey);
     //PrintToChatAll(urlextend);
     
     httpClient.Get(url_sufix, OnJobReceived);
