@@ -1,10 +1,10 @@
-const checkLoginStatus = () => {
+const checkLoginStatus = (url) => {
     if (localStorage.getItem("user_token") !== null) {
-        window.location.replace("dashboard.html");
+        window.location.replace(url+"site/dashboard");
     }
 }
 
-const login = () => {
+const login = (url) => {
     toastr.options = {
         "closeButton": false,
         "debug": false,
@@ -42,7 +42,7 @@ const login = () => {
             } else if (obj.hasOwnProperty('token')) {
                 localStorage.setItem("user_token", obj["token"]);
                 toastr["success"]("Logged in!");
-                window.location.replace("dashboard.html");
+                window.location.replace(url+"site/dashboard");
             } else {
                 toastr["error"]("Something went wrong... sorry :(");
             }

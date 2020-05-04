@@ -50,12 +50,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 
-<body onload="checkLoginStatus()">
+<body onload=checkLoginStatus(<?php echo "\"" . base_url() . "\""; ?>)>
 
     <div id="particles-js">
         <nav class="navbar navbar-dark" style="background-color: #2f2f2f;">
             <a class="navbar-brand" href="#">
-                <img src="radon_logo.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+                <img src="<?php echo base_url(); ?>assets/radon_logo.svg" width="30" height="30" class="d-inline-block align-top" alt="">
                 Radon Dashboard
             </a>
         </nav>
@@ -70,7 +70,7 @@
                             <input type="password" class="form-control" id="input_password" placeholder="Password"
                                 required>
                         </div>
-                        <button type="button" class="btn btn-success" id="loginbtn" onclick="login()">Login</button>
+                        <button type="button" class="btn btn-success" id="loginbtn" onclick=login(<?php echo "\"" . base_url() . "\""; ?>)>Login</button>
                     </form>
                 </div>
             </div>
@@ -88,8 +88,8 @@
         integrity="sha256-T/f7Sju1ZfNNfBh7skWn0idlCBcI3RwdLSS4/I7NQKQ=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script src="config.js"></script>
-    <script src="login.js"></script>
+    <script src="<?php echo base_url(); ?>assets/config.js"></script>
+    <script src="<?php echo base_url(); ?>assets/login.js"></script>
     <script>
         particlesJS("particles-js", {
             "particles": {

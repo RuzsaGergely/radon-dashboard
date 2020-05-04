@@ -7,6 +7,16 @@ class Site extends CI_Controller {
 	{
 		$this->load->view('site/welcome');
 		$this->load->helper('url');
-	}
+    }
+
+	public function login(){
+        $this->load->helper('url');
+        $this->load->view('site/login/loginpage');
+    }
+
+    public function dashboard(){
+        $this->load->helper('url');
+        $this->load->view('site/login/dashboard');
+    }
 
 }

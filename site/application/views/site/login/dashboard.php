@@ -53,7 +53,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 
-<body onload="checkLoginStatus()">
+<body onload=checkLoginStatus(<?php echo "\"" . base_url() . "\""; ?>)>
 
     <div class="bmd-layout-container bmd-drawer-f-l bmd-drawer-overlay">
         <header class="bmd-layout-header">
@@ -69,7 +69,7 @@
         </header>
         <div id="dw-s1" class="bmd-layout-drawer bg-faded">
             <header>
-                <p><img style=" -webkit-filter: invert(100%); filter: invert(100%);" src="radon_logo.svg" width="30"
+                <p><img style=" -webkit-filter: invert(100%); filter: invert(100%);" src="<?php echo base_url(); ?>assets/radon_logo.svg" width="30"
                         height="30" alt=""> Radon Dashboard</p>
             </header>
             <ul class="list-group">
@@ -84,6 +84,10 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="displayOverview()"><span
                             class="material-icons icon">bar_chart</span>&ensp;Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="displayUserCreation()"><span
+                            class="material-icons icon">account_box</span>&ensp;User</a>
                 </li>
                 <div class="fixed-bottom">
                     <div class="dropdown-divider"></div>
@@ -128,8 +132,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"
         integrity="sha256-T/f7Sju1ZfNNfBh7skWn0idlCBcI3RwdLSS4/I7NQKQ=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="config.js"></script>
-    <script src="dashboard_control.js"></script>
+    <script src="<?php echo base_url(); ?>assets/config.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dashboard_control.js"></script>
 </body>
 
 </html>

@@ -535,7 +535,7 @@ class Api extends CI_Controller
             } else {
                 if(preg_match("#[a-zA-Z][0-9]+#", $decoded["password"]) && strlen($decoded["password"]) >= 8){
                     $sql = "INSERT INTO `users`(`username`, `password`) VALUES (?,?)";
-                    $this->db->query($sql, array($decoded["username"], password_hash($decoded["password"])));
+                    $this->db->query($sql, array($decoded["username"], password_hash($decoded["password"], PASSWORD_BCRYPT, ["cost" => 10])));
                     if($this->db->affected_rows() > 0){
                         $this->respError(200, "OK", "User created!");
                     } else {
