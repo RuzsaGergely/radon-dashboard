@@ -349,6 +349,37 @@ class Api extends CI_Controller
         }
     }
 
+    public function addServer(){
+
+        if($_SERVER['REQUEST_METHOD'] == "POST") {
+
+            $rawdata = file_get_contents("php://input");
+            $decoded = json_decode($rawdata, true);
+
+            if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                $this->addServerHandler($decoded);
+            } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+                $token = explode(":",base64_decode($decoded["key"], true));
+                $sql = "SELECT * FROM `users` WHERE `username`=?";
+                $query = $this->db->query($sql, array($token[0]));
+                foreach ($query->result() as $row)
+                {
+                    if(password_verify($token[1], $row->password)) {
+                        $this->addServerHandler($decoded);
+                    } else {
+                        $this->respError(400, "Bad request", "Wrong username or password");
+                    }
+                }
+            } else {
+                $this->respError(400, "Bad request", "Invalid auth");
+            }
+
+
+        } else {
+            $this->respError(400, "Bad request", "Invalid request type");
+        }
+    }
+
     // Not reachable from browser or through API request
 	private function respError($httpcode, $httpstatus, $errormessage)
 	{
@@ -543,6 +574,26 @@ class Api extends CI_Controller
                     }
                 } else {
                     $this->respError(400, "Bad request", "Password not fulfills the requirements");
+                }
+            }
+        } else {
+            $this->respError(400, "Bad request", "Invalid or empty input");
+        }
+    }
+
+    private function addServerHandler($decoded){
+        if(isset($decoded["servername"], $decoded["serverid"]) && !empty($decoded["servername"] . $decoded["serverid"])){
+            $sql = "SELECT * FROM `servers` WHERE `id`=?";
+            $this->db->query($sql, $decoded["serverid"]);
+            if($this->db->affected_rows() > 0){
+                $this->respError(400, "Bad request", "Server ID already exists!");
+            } else {
+                $sql = "INSERT INTO `servers`(`id`, `servername`) VALUES (?,?)";
+                $this->db->query($sql, array($decoded["serverid"], $decoded["servername"]));
+                if($this->db->affected_rows() > 0){
+                    $this->respError(200, "OK", "Server added!");
+                } else {
+                    $this->respError(500, "Server Error", "Something went wrong");
                 }
             }
         } else {

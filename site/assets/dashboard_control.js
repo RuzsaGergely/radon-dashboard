@@ -236,3 +236,34 @@ const addUser = () => {
             });
     }
 }
+
+const displayAddServer = () => {
+    let container = document.getElementById("display-container");
+    container.innerHTML = "<h1>Add Server</h1><form> <div class=\"form-group\"> <input type=\"number\" class=\"form-control\" id=\"addserver_id\" placeholder=\"ID of the server\" required> </div> <div class=\"form-group\"> <input type=\"text\" class=\"form-control\" id=\"addserver_name\" placeholder=\"Name of the server\" required> </div> <button type=\"button\" class=\"btn btn-success\" onclick=\"addServer()\">Add Server</button> </form>";
+}
+
+const addServer = () =>{
+    if (document.getElementById("addserver_id").value === "" || document.getElementById("addserver_name").value === "") {
+        toastr["error"]("Empty input!");
+    } else {
+        instance.post('addServer', {
+            "serverid": document.getElementById("addserver_id").value,
+            "servername": document.getElementById("addserver_name").value,
+            "key": localStorage.getItem("user_token")
+        })
+            .then(response => {
+                const respmesssage = response.data;
+                console.log(respmesssage);
+                var obj = JSON.parse(JSON.stringify(respmesssage));
+                if (obj['http_code'] == 200) {
+                    toastr["success"]("Server added!");
+                } else {
+                    toastr["error"]("Something went wrong");
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                toastr["error"]("Something went wrong... sorry :(");
+            });
+    }
+}

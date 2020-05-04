@@ -11,12 +11,12 @@ class Site extends CI_Controller {
 
 	public function login(){
         $this->load->helper('url');
-        $this->load->view('site/login/loginpage');
+        $this->load->view('site/loginpage');
     }
 
     public function dashboard(){
         $this->load->helper('url');
-        $this->load->view('site/login/dashboard');
+        $this->load->view('site/dashboard');
     }
 
 }

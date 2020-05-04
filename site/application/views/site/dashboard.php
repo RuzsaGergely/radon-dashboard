@@ -87,7 +87,11 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="displayUserCreation()"><span
-                            class="material-icons icon">account_box</span>&ensp;User</a>
+                            class="material-icons icon">how_to_reg</span>&ensp;Add User</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="displayAddServer()"><span
+                            class="material-icons icon">add</span>&ensp;Add Server</a>
                 </li>
                 <div class="fixed-bottom">
                     <div class="dropdown-divider"></div>
