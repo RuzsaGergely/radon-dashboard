@@ -194,7 +194,7 @@ Request body:
 ```json
 {
 	"ctpoint": 1,
-    "tpoint": 2,
+    	"tpoint": 2,
 	"key": "youapikey"
 }
 ```
