@@ -126,7 +126,7 @@ Request body:
 ```json
 {
 	"map": "mapname",
-    "key": "youapikey"
+	"key": "youapikey"
 }
 ```
 
@@ -140,7 +140,7 @@ Request body:
 {
 	"team": 1,
 	"country": "hu",
-    "key": "youapikey"
+	"key": "youapikey"
 }
 ```
 
@@ -158,7 +158,7 @@ Request body:
 {
 	"team": 1,
 	"name": "ITdept",
-    "key": "yourapikey"
+	"key": "yourapikey"
 }
 ```
 
@@ -179,7 +179,7 @@ Request body:
 ```json
 {
 	"tasknum": 1,
-    "key": "youapikey"
+	"key": "youapikey"
 }
 ```
 
@@ -194,8 +194,8 @@ Request body:
 ```json
 {
 	"ctpoint": 1,
-	"tpoint": 2,
-    "key": "youapikey"
+    "tpoint": 2,
+	"key": "youapikey"
 }
 ```
 
@@ -217,8 +217,8 @@ Request body:
 {
 	"txt": "\"Hello\"",
 	"team1": "\"Szia\"",
-    "team2": "\"Ciao\"",
-    "key": "youapikey"
+	"team2": "\"Ciao\"",
+	"key": "youapikey"
 }
 ```
 
@@ -234,7 +234,7 @@ Request body:
 {
 	"username": "yourusername",
 	"password": "yourpass",
-    "key": "youapikey"
+	"key": "youapikey"
 }
 ```
 
@@ -242,7 +242,7 @@ This will create a user for the frontend.
 
 ### getServers
 
-GET*/api/getServers/*
+GET */api/getServers/*
 
 No request body. This will list all of the server which registered in the database.
 
@@ -256,7 +256,7 @@ Request body:
 {
 	"serverid": 1,
 	"servername": "MyLittleServer",
-    "key": "youapikey"
+	"key": "youapikey"
 }
 ```
 
