@@ -17,23 +17,14 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+
+                if($this->authModule($decoded)){
                     $this->changeTeamnameHandler($server, $decoded);
-                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                    $token = explode(":",base64_decode($decoded["key"], true));
-                    $sql = "SELECT * FROM `users` WHERE `username`=?";
-                    $query = $this->db->query($sql, array($token[0]));
-                    foreach ($query->result() as $row)
-                    {
-                        if(password_verify($token[1], $row->password)) {
-                            $this->changeTeamnameHandler($server, $decoded);
-                        } else {
-                            $this->respError(400, "Bad request", "Wrong username or password");
-                        }
-                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid auth");
+                    $this->respError(400, "Bad request", "Bad auth");
                 }
+
+
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
             }
@@ -51,23 +42,12 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                if($this->authModule($decoded)){
                     $this->changeFlagHandler($server, $decoded);
-                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                    $token = explode(":",base64_decode($decoded["key"], true));
-                    $sql = "SELECT * FROM `users` WHERE `username`=?";
-                    $query = $this->db->query($sql, array($token[0]));
-                    foreach ($query->result() as $row)
-                    {
-                        if(password_verify($token[1], $row->password)) {
-                            $this->changeFlagHandler($server, $decoded);
-                        } else {
-                            $this->respError(400, "Bad request", "Wrong username or password");
-                        }
-                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid auth");
+                    $this->respError(400, "Bad request", "Bad auth");
                 }
+
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
             }
@@ -87,23 +67,12 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                if($this->authModule($decoded)){
                     $this->changeMapHandler($server, $decoded);
-                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                    $token = explode(":",base64_decode($decoded["key"], true));
-                    $sql = "SELECT * FROM `users` WHERE `username`=?";
-                    $query = $this->db->query($sql, array($token[0]));
-                    foreach ($query->result() as $row)
-                    {
-                        if(password_verify($token[1], $row->password)) {
-                            $this->changeMapHandler($server, $decoded);
-                        } else {
-                            $this->respError(400, "Bad request", "Wrong username or password");
-                        }
-                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid auth");
+                    $this->respError(400, "Bad request", "Bad auth");
                 }
+
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
             }
@@ -120,23 +89,12 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                if($this->authModule($decoded)){
                     $this->doneTaskHandler($server, $decoded);
-                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                    $token = explode(":",base64_decode($decoded["key"], true));
-                    $sql = "SELECT * FROM `users` WHERE `username`=?";
-                    $query = $this->db->query($sql, array($token[0]));
-                    foreach ($query->result() as $row)
-                    {
-                        if(password_verify($token[1], $row->password)) {
-                            $this->doneTaskHandler($server, $decoded);
-                        } else {
-                            $this->respError(400, "Bad request", "Wrong username or password");
-                        }
-                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid auth");
+                    $this->respError(400, "Bad request", "Bad auth");
                 }
+
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
             }
@@ -148,30 +106,30 @@ class Api extends CI_Controller
 
     public function getTasks($server=null){
 
-        if($server!=null && is_numeric($server)){
-            if($_SERVER['REQUEST_METHOD'] == "GET") {
-                $sql = "SELECT * FROM `jobs` WHERE `servernum`= ?";
-                $query = $this->db->query($sql, array($server));
+    if($server!=null && is_numeric($server)){
+        if($_SERVER['REQUEST_METHOD'] == "GET") {
+            $sql = "SELECT * FROM `jobs` WHERE `servernum`= ?";
+            $query = $this->db->query($sql, array($server));
 
-                $response = array();
-                foreach ($query->result() as $row)
-                {
-                    array_push($response, array(
-                        "tasknum" =>$row->tasknum,
-                        "task" => $row->task
-                    ));
-                }
-                header('Content-Type: application/json');
-                $json_response = json_encode($response);
-                echo $json_response;
-            } else {
-                $this->respError(400, "Bad request", "Invalid request type");
+            $response = array();
+            foreach ($query->result() as $row)
+            {
+                array_push($response, array(
+                    "tasknum" =>$row->tasknum,
+                    "task" => $row->task
+                ));
             }
+            header('Content-Type: application/json');
+            $json_response = json_encode($response);
+            echo $json_response;
         } else {
-            $this->respError(400, "Bad request", "Invalid or no argument");
+            $this->respError(400, "Bad request", "Invalid request type");
         }
-
+    } else {
+        $this->respError(400, "Bad request", "Invalid or no argument");
     }
+
+}
 
     public function setPoints($server=null){
 
@@ -181,24 +139,11 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                if($this->authModule($decoded)){
                     $this->setPointsHandler($server, $decoded);
-                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                    $token = explode(":",base64_decode($decoded["key"], true));
-                    $sql = "SELECT * FROM `users` WHERE `username`=?";
-                    $query = $this->db->query($sql, array($token[0]));
-                    foreach ($query->result() as $row)
-                    {
-                        if(password_verify($token[1], $row->password)) {
-                            $this->setPointsHandler($server, $decoded);
-                        } else {
-                            $this->respError(400, "Bad request", "Wrong username or password");
-                        }
-                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid auth");
+                    $this->respError(400, "Bad request", "Bad auth");
                 }
-
 
             } else {
                 $this->respError(400, "Bad request", "Invalid request type");
@@ -237,23 +182,12 @@ class Api extends CI_Controller
                 $rawdata = file_get_contents("php://input");
                 $decoded = json_decode($rawdata, true);
 
-                if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+                if($this->authModule($decoded)){
                     $this->changeStatsHandler($server, $decoded);
-                } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                    $token = explode(":",base64_decode($decoded["key"], true));
-                    $sql = "SELECT * FROM `users` WHERE `username`=?";
-                    $query = $this->db->query($sql, array($token[0]));
-                    foreach ($query->result() as $row)
-                    {
-                        if(password_verify($token[1], $row->password)) {
-                            $this->changeStatsHandler($server, $decoded);
-                        } else {
-                            $this->respError(400, "Bad request", "Wrong username or password");
-                        }
-                    }
                 } else {
-                    $this->respError(400, "Bad request", "Invalid auth");
+                    $this->respError(400, "Bad request", "Bad auth");
                 }
+
             }else {
                 $this->respError(400, "Bad request", "Invalid request type");
             }
@@ -325,24 +259,11 @@ class Api extends CI_Controller
             $rawdata = file_get_contents("php://input");
             $decoded = json_decode($rawdata, true);
 
-            if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+            if($this->authModule($decoded)){
                 $this->createUserHandler($decoded);
-            } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                $token = explode(":",base64_decode($decoded["key"], true));
-                $sql = "SELECT * FROM `users` WHERE `username`=?";
-                $query = $this->db->query($sql, array($token[0]));
-                foreach ($query->result() as $row)
-                {
-                    if(password_verify($token[1], $row->password)) {
-                        $this->createUserHandler($decoded);
-                    } else {
-                        $this->respError(400, "Bad request", "Wrong username or password");
-                    }
-                }
             } else {
-                $this->respError(400, "Bad request", "Invalid auth");
+                $this->respError(400, "Bad request", "Bad auth");
             }
-
 
         } else {
             $this->respError(400, "Bad request", "Invalid request type");
@@ -356,24 +277,11 @@ class Api extends CI_Controller
             $rawdata = file_get_contents("php://input");
             $decoded = json_decode($rawdata, true);
 
-            if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+            if($this->authModule($decoded)){
                 $this->addServerHandler($decoded);
-            } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
-                $token = explode(":",base64_decode($decoded["key"], true));
-                $sql = "SELECT * FROM `users` WHERE `username`=?";
-                $query = $this->db->query($sql, array($token[0]));
-                foreach ($query->result() as $row)
-                {
-                    if(password_verify($token[1], $row->password)) {
-                        $this->addServerHandler($decoded);
-                    } else {
-                        $this->respError(400, "Bad request", "Wrong username or password");
-                    }
-                }
             } else {
-                $this->respError(400, "Bad request", "Invalid auth");
+                $this->respError(400, "Bad request", "Bad auth");
             }
-
 
         } else {
             $this->respError(400, "Bad request", "Invalid request type");
@@ -461,13 +369,35 @@ class Api extends CI_Controller
 
     private function changeMapHandler($server, $decoded){
         $maps = array(
+            "de_cache",
             "de_dust2",
+            "de_mirage",
+            "de_overpass",
+            "de_nuke",
             "de_inferno",
             "de_train",
-            "de_mirage",
-            "de_nuke",
-            "de_overpass",
-            "de_vertigo"
+            "de_cbble",
+            "de_canals",
+            "de_subzero",
+            "de_shortdust",
+            "de_shortnuke",
+            "de_shorttrain",
+            "cs_agency",
+            "cs_assault",
+            "cs_italy",
+            "cs_office",
+            "de_austria",
+            "de_biome",
+            "ar_baggage",
+            "de_lake",
+            "ar_monastery",
+            "de_safehouse",
+            "ar_shoots",
+            "de_stmarc",
+            "de_bank",
+            "de_sugarcane",
+            "ar_dizzy",
+            "gd_rialto"
         );
 
         if (isset($decoded["map"]) && in_array($decoded["map"], $maps)){
@@ -530,7 +460,7 @@ class Api extends CI_Controller
     private function changeStatsHandler($server, $decoded){
         if(isset($decoded["txt"], $decoded["team1"], $decoded["team2"], $decoded["key"]) && !empty($decoded["team1"] . $decoded["team2"])){
             $count = 0;
-            if(empty($decoded["txt"])){
+            if(!empty($decoded["txt"])){
                 $sql = "INSERT INTO `jobs`(`servernum`, `task`) VALUES (?,?)";
                 $this->db->query($sql, array($server, "mp_teammatchstat_txt " . $decoded["txt"]));
                 if($this->db->affected_rows() > 0){
@@ -598,6 +528,27 @@ class Api extends CI_Controller
             }
         } else {
             $this->respError(400, "Bad request", "Invalid or empty input");
+        }
+    }
+
+    private function authModule($decoded){
+
+        if (isset($decoded["key"]) && $decoded["key"] == API_KEY){
+            return true;
+        } else if(isset($decoded["key"]) && $this->is_token($decoded["key"])) {
+            $token = explode(":",base64_decode($decoded["key"], true));
+            $sql = "SELECT * FROM `users` WHERE `username`=?";
+            $query = $this->db->query($sql, array($token[0]));
+            foreach ($query->result() as $row)
+            {
+                if(password_verify($token[1], $row->password)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return false;
         }
     }
 
