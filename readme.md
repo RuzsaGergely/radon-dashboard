@@ -67,7 +67,7 @@ $db['default'] = array(
 );
 ```
 
-After the database credentials are saved, you need to create an API key for the plugin. A simple string generator will do it, I used this [site](http://passwordsgenerator.net/) for example. You need to change the default API key to yours in "application/config/database.php". Example:
+After the database credentials are saved, you need to create an API key for the plugin. A simple string generator will do it, I used this [site](http://passwordsgenerator.net/) for example. You need to change the default API key to yours in "application/config/constants.php". Example:
 
 ```php
 // Custom constants
