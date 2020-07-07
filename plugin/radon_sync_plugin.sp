@@ -8,7 +8,7 @@ public Plugin myinfo =
 	author = "Ruzsa 'RuzGer' Gergely",
 	description = "The plugin for synchronization with the database",
 	version = "1.0",
-	url = "http://ruzger.hu/"
+	url = "https://ruzger.hu/"
 };
 
 /*
@@ -17,6 +17,7 @@ TO-DO:
  */
 
 char servernum[10];
+char site[1024];
 new String:api_key[128]
 
 HTTPClient httpClient;
@@ -24,14 +25,13 @@ HTTPClient httpClient;
 public void OnPluginStart()
 {
     HookEvent("round_start", OnRoundStart, EventHookMode_PostNoCopy); 
-	CreateTimer(0.5, Check_server, _, TIMER_REPEAT);
+	CreateTimer(10, Check_server, _, TIMER_REPEAT);
 
     decl String:path[PLATFORM_MAX_PATH];
 
     BuildPath(Path_SM,path,PLATFORM_MAX_PATH,"settings.txt");
     new Handle:fileHandle=OpenFile(path,"r");
     ReadFileLine(fileHandle,servernum,sizeof(servernum));
-    char site[1024];
     ReadFileLine(fileHandle,site,sizeof(site));
     CloseHandle(fileHandle);
 
@@ -58,19 +58,17 @@ public OnRoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 // This function checks the server for jobs
 public Action Check_server(Handle timer)
 {
-
     char url_sufix[512];
     Format(url_sufix, sizeof(url_sufix), "/getTasks/%d", StringToInt(servernum));
-    //PrintToChatAll(site);
+    PrintToChatAll(site);
     //PrintToChatAll(urlextend);
     httpClient.Get(url_sufix, OnJobReceived);
-
 }
 
 public void OnJobReceived(HTTPResponse response, any value)
 {
     if (response.Status != HTTPStatus_OK) {
-        PrintToChatAll("HTTP status not 200! Error!");
+        PrintToChatAll("HTTP status not 200! Error! 01");
         return;
     }
     if (response.Data == null) {
@@ -114,7 +112,7 @@ public void OnJobReceived(HTTPResponse response, any value)
 public void OnTaskDone(HTTPResponse response, any value)
 {
     if (response.Status != HTTPStatus_Created) {
-        PrintToChatAll("HTTP status not 200! Error!");
+        PrintToChatAll("HTTP status not 200! Error! 02");
         return;
     }
     if (response.Data == null) {
@@ -131,7 +129,7 @@ public void OnTaskDone(HTTPResponse response, any value)
 public void OnPointUpdate(HTTPResponse response, any value)
 {
     if (response.Status != HTTPStatus_Created) {
-        PrintToChatAll("HTTP status not 200! Error!");
+        PrintToChatAll("HTTP status not 200! Error! 03");
         return;
     }
     if (response.Data == null) {
