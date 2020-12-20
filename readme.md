@@ -1,5 +1,7 @@
 # Radon dashboard
 
+**This project hasn't been updated since the last commit. The plugin might broken and won't work with newer versions of CS:GO server**
+
 ## Install
 
 ### API install
