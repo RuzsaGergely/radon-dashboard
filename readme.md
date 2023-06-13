@@ -1,6 +1,7 @@
 # Radon dashboard
 
-**This project hasn't been updated since the last commit. The plugin might broken and won't work with newer versions of CS:GO server**
+**2020. Dec. 20.: This project hasn't been updated since the last commit. The plugin might broken and won't work with newer versions of CS:GO server**
+**2023. Jun. 13.: This project is officially abandoned. Please, consider searching an another codebase for your project.**
 
 ## Install
 
